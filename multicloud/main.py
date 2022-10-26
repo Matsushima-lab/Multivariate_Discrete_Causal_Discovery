@@ -99,9 +99,9 @@ class ThreeValCodeLength():
 
     def _model7(self):
         loglikelihood = 0
-        loglikelihood += self.effect_likelihood(self.Y, self.X)
-        loglikelihood += self.exogenousnoise_likelihood(self.Y_freqs)
-        loglikelihood += self.effect_likelihood(self.Y, self.Z)
+        loglikelihood += self.effect_likelihood(self.Z, self.X)
+        loglikelihood += self.effect_likelihood(self.Z, self.Y)
+        loglikelihood += self.exogenousnoise_likelihood(self.Z_freqs)
         return loglikelihood
     
     def _model8(self):
@@ -192,7 +192,7 @@ class ThreeValCodeLength():
     
     def _model19(self):
         loglikelihood = 0
-        loglikelihood += self.exogenousnoise_likelihood(self.Z_freqs)
+        loglikelihood += self.exogenousnoise_likelihood(self.X_freqs)
         loglikelihood += self.effect_likelihood(self.X, self.Y)
         loglikelihood += self.effect_likelihood(self.Y, self.Z)
         return loglikelihood
@@ -241,6 +241,7 @@ class ThreeValCodeLength():
     
     def predict(self):
         code_length = [eval(f"self._model{i}()", {"self": self}) for i in range(1, 26)]
+        #print(np.argsort(code_length) + 1)
         return np.argmin(code_length) + 1
 
 if __name__ == "__main__":
