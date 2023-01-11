@@ -9,6 +9,7 @@ from test_3vars import (
         map_randomly,
         generate_sequence
         )
+from utils import SHD
 
 # gc設定
 gc.enable()
@@ -37,9 +38,9 @@ def test_4vars(aegs):
     X4 = [(f34[x3] + e4) % args.x4 for x3, e4 in zip(X3, E4)]
 
     data = np.stack([X1, X2, X3, X4], axis=-1)
-    estimate, score = ges.fit_nml(data)
-#    print(estimate)
-    return (estimate == [[0, 1, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1], [0, 0, 0, 0]]).all()
+    estimate, score = ges.fit_nml(data, phases = ['forward'])
+    true_graph= [[0, 1, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1], [0, 0, 0, 0]]
+    return (estimate == true_graph).all(), SHD(estimate, true_graph)
 
 if  __name__ == "__main__":
     nsim = 100
@@ -52,14 +53,12 @@ if  __name__ == "__main__":
     parser.add_argument("--sample_size", type=int, default=1000, help="sample size")
     args = parser.parse_args()
 
-
-    #from ges.scores.nml_pen import NmlPen
-    #model = NmlPen(data)
-    #print(model.full_score(A=np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])))
-    #print(model.full_score(A=np.array([[0, 0, 0], [0, 0, 1], [0, 0, 0]])))
-    #print(model.full_score(A=np.array([[0, 1, 1], [0, 0, 0], [0, 0, 0]])))
-    #print(model.full_score(A=np.array([[0, 0, 0], [1, 0, 0], [1, 0, 0]])))
-    #print(model.full_score(A=np.array([[0, 1, 1], [0, 0, 1], [0, 0, 0]])))
-    #print(model.full_score(A=np.array([[0, 1, 0], [0, 0, 0], [1, 0, 0]])))
-    res1 = sum([test_4vars(args) for _ in tqdm(range(nsim))])
-    logger.info(f"model1 acc: {res1 / nsim:.3f}")
+    acc_res= 0
+    shd_res = [None] * nsim
+    for i in tqdm(range(nsim)):
+        correct, shd = test_4vars(args)
+        acc_res += correct
+        shd_res[i] = shd
+    print(shd_res)
+    logger.info(f"4vars SHD result: {np.mean(shd_res):.3f} ± {np.std(shd_res):.3f}")
+    logger.info(f"4vars acc result: {acc_res / nsim:.3f}")

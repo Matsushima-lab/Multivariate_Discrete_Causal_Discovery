@@ -46,7 +46,7 @@ def test_5vars(aegs):
         [0, 0, 0, 1, 0],
         [0, 0, 0, 0, 1],
         [0, 0, 0, 0, 0]]
-    return (estimate == true_graph).all(), SHD(estimate, true_graph)
+    return (estimate == true_graph).all(), SHD(estimate, true_graph, double_for_anticausal=False)
 
 if  __name__ == "__main__":
     nsim = 100
